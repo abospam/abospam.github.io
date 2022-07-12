@@ -1,0 +1,245 @@
+---
+title: "Processes and File Handles"
+date: 2017-02-08
+author: Geoffrey Challen
+description: >
+  Introduction to file handles and file descriptors and the process life
+  cycle.
+song:
+  name: "Killer in the Street"
+  author: The Raveonettes
+  youtube: V93GmEBL3YY
+spelling_exceptions:
+  - pmap
+  - lsof
+  - bashrc
+  - proc
+video: A1BSEVBLg6M
+---
+[.nooutline.spelling_exception]
+== Technical Women
+
+image::women/001.jpg[width="100%",title="Jean Bartik",link="https://en.wikipedia.org/wiki/Jean_Bartik"]
+
+[.center.h2]
+icon:music[] http://www.theraveonettes.com/[{song}]
+
+video::{music}[youtube,width=0,height=0]
+
+[.nooutline]
+== Today
+
+. File handles.
+. Process life cycle:
+** *Birth:* `fork()`
+** *Change:* `exec()`
+** *Death:* `exit()`
+** *The Afterlife:* `wait()`
+
+[.nooutline]
+== link:/asst/1/[ASST1] Checkpoint
+
+[.slider]
+//
+.At this point:
+//
+* If you have not started, *you are behind.*
+//
+* If you don't understand semaphores, *you are behind.*
+//
+* If you have working locks, you're a bit behind.
+//
+* If you have working CVs, you're OK.
+//
+* Keep in mind: *you need working locks and CVs for future assignments.*
+//
+** (The rest of the assignment is for points and won't hurt you as much in the
+future.)
+
+[.nooutline]
+== Announcement Questions?
+
+== $ pmap # memory mappings
+
+image::figures/pmap.svg[width="100%"]
+
+== bash
+
+image::figures/process-bash-1.svg[width="100%"]
+
+== $ lsof # open files
+
+image::figures/lsof.svg[width="100%"]
+
+[.slider]
+.True confessions: I cheated here.
+* `/home/challen/.bashrc` was not actually open when I ran this command.
+* `bash` didn't have any interesting files open and I was embarrassed.
+
+== !
+[.background]
+image:https://i.ytimg.com/vi/7erl9k01C2M/hqdefault.jpg[]
+
+[.meme-top]
+bashrc not open
+
+[.meme-bottom,.small]
+Professor resorts to lying
+
+== $ lsof # open files
+
+image::figures/lsof.svg[width="100%"]
+
+.True confessions: I cheated here.
+* `/home/challen/.bashrc` was not actually open when I ran this command.
+* `bash` didn't have any interesting files open and I was embarrassed.
+
+[.slider]
+--
+Let's imagine we caught bash during startup when it is reading its
+configuration parameters.
+--
+
+== bash
+
+image::figures/process-bash.svg[width="100%"]
+
+== Aside: the /proc/ file system
+
+[.slider.small]
+* How do `top`, `ps`, `pmap`, `lsof`, and other process examination utilities
+gather information?
+* Linux reuses the *file* abstraction for this purpose.
+
+image::figures/procfilesystem.svg[width="100%",role='slide']
+
+== OK... Let's Review
+
+== OS Abstraction Cheat Sheet
+
+[.slider]
+* *Threads* save processor state.
+* *Address spaces* map the addresses used by processes (virtual
+addresses) to real memory addresses (physical addresses).
+* *Files* map offsets into a file to blocks on disk.
+* *File-like objects* look like files to a process but are not actually
+stored on disk and may not completely obey file semantics.
+** You can't seek on a network socket or open certain network-mounted
+files.
+* *Processes* organize these other operating system abstractions.
+
+[.nooutline]
+== Review: Abstractions
+
+[.slider]
+.Abstractions *simplify application design* by:
+* *hiding undesirable properties*,
+* *adding new capabilities*, and
+* *organizing information*.
+
+[.nooutline]
+== Review: Processes
+
+Processes [.slide]*organize information* about other abstractions and represent
+a single thing that [.slide]*the computer is "doing."*
+
+[.slider]
+.Processes contain:
+* one or more *threads*,
+* an *address space*, and
+* zero or more open *file handles*.
+
+[.nooutline]
+== Review: Processes
+
+[.slider]
+* Processes organize information about other abstractions and represent
+a single thing that the computer is "doing."
+* Processes contain:
+** one or more *threads*,
+** an *address space*, and
+** zero or more open *file handles*.
+
+[.nooutline]
+== Review: Protection
+
+One major operating system goal is to protect processes from [.slide]*each
+other*.
+
+[.nooutline]
+== So Now: Questions About Processes?
+
+== Updated Process Model
+
+[.slider]
+* For today's material being precise about how processes use files
+becomes important.
+
+[.slide.replace]
+--
+* So let's update our model. Here's what we had last time:
+
+image::figures/process.svg[width="50%",role='vbottom expand']
+--
+
+[.slide.replace]
+--
+* So let's update our model. Here's what we had last time:
+* And here's today's change:
+
+image::figures/process-updated.svg[width="50%",role='expand vbottom']
+--
+
+== File Handles
+
+[.slider]
+* The *file descriptor* that processes receive from `open()` and pass to
+other file system system calls is just an int, an index into the process
+file table.
+* That int refers to a *file handle* object maintained by the kernel.
+* That file handle object contains a reference a separate *file object*
+also maintained by the kernel.
+* Which then is mapped by the file system to blocks on disk.
+* So *three* levels of indirection:
+** file descriptor -> file handle.
+** file handle -> file object.
+** file object -> blocks on disk.
+* *Why?*
+
+== !
+
+[.background]
+image:http://geeklypress.com/wp-content/uploads/2013/08/confused-cat.jpg[]
+
+[.meme-top]
+Are you just trying
+[.meme-bottom]
+to confuse me?
+
+== Sharing File State
+
+[.slider]
+.The additional level of indirection allows certain pieces of state to be shared separately.
+* *File descriptors* are private to each process.
+* *File handles* are private to each process but shared after process
+creation.
+** *File handles* store the current file *offset*, or the position in
+the file that the next read will come from or write will go to. File
+handles can be *deliberately* shared between two processes.
+* *File objects* hold other file state and can be shared *transparently*
+between many processes.
+
+== Operating System Design Principles
+
+[.slider]
+* Separate [.slide]*policy* from [.slide]*mechanism*.
+* Facilitate control or sharing by adding a [.slide]*level of indirection*.
+
+
+[.nooutline]
+== Next Time
+
+* Continue with `fork()`
+* Begin talking about synchronization
+
+// vim: ts=2:sw=2:et

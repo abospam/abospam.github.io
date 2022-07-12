@@ -1,0 +1,518 @@
+---
+title: "<code>ops-class.org</code> Setup"
+description: >
+  Overview of how to download the OS/161 source code and install a
+  ops-class.org toolchain.
+omitTop: true
+priority: 0.8
+changefreq: monthly
+spelling_exceptions:
+  - LTS
+  - Trusty Tahr
+  - Xenial Xerus
+  - Bento
+  - Vagrantfile
+  - EC2
+  - VMware
+---
+:sectnums:
+
+[.lead]
+//
+{ops-class} assignments start with the {os161} instructional operating system
+and require a special toolchain to compile, run, debug, and test.
+//
+This page describes how to get the sources and install the toolchain.
+
+== Toolchain
+
+Your options for installing the toolchain depend on the operating system
+running on the computer that you are going to develop on:
+
+. *Windows*:
+//
+** Perform a link:#gui[full installation of Ubuntu including a GUI] and then
+install the toolchain by adding our link:#ppa[`ops-class.org` PPA].
+//
+** Use our link:#vagrant[Vagrantfile] to boot a headless Ubuntu virtual
+machine with the toolchain installed.
+//
+** If you are running a version of Windows (10+) that supports the
+https://msdn.microsoft.com/en-us/commandline/wsl/install_guide[Windows
+Subsystem for Linux], you may be able to install and run the toolchain
+directly on Windows by adding our link:#ppa[`ops-class.org` PPA].
+//
+. *Mac OS*:
+//
+** Perform a link:#gui[full installation of Ubuntu including a GUI] and then
+install the toolchain by adding our link:#ppa[`ops-class.org` PPA].
+//
+** Use our link:#vagrant[Vagrantfile] to boot a headless Ubuntu virtual
+machine with the toolchain installed.
+//
+** Run natively by link:#source[installing from source].
+//
+. *Ubuntu* (or other Linux distributions that support Debian packaging):
+//
+** Install the toolchain natively by adding our link:#ppa[`ops-class.org`
+PPA].
+//
+. *Other UNIX systems*:
+//
+** Run natively by link:#source[installing from source].
+
+You'll note that most of these options boil down to getting Ubuntu installed
+somehow--either with or without a GUI--and then using our packages.
+//
+The only exceptions are Windows installations that can use the packages
+natively, or those that want to install from source for some reason.
+
+We review the main options below.
+
+[[gui]]
+=== Virtual Machine with GUI
+
+Consider this option if:
+
+* your computer is beefy enough to run a full GUI-based virtual machine (many
+are), and
+//
+* you prefer editing source code using a graphical editor like
+//
+https://atom.io/[Atom],
+//
+https://www.sublimetext.com/[Sublime],
+//
+https://eclipse.org/[Eclipse], etc.
+
+There are many tutorials on how to install Ubuntu using VirtualBox
+footnote:[Or VMware, or Parallels, etc...]&mdash;http://www.beopensource.com/2016/05/how-to-install-Ubuntu-1604-LTS-in-Virtual-Box-VmWare.html[here's
+one]&mdash;so we aren't going to maintain one here.
+//
+We would suggest choosing http://releases.ubuntu.com/16.04/[Ubuntu 16.04 LTS
+"Xenial Xerus"], the latest LTS (Long Term Support) version.
+//
+We have packages ready for it as well as
+//
+http://releases.ubuntu.com/14.04/[Ubuntu 14.04 LTS "Trusty Tahr"].
+
+One you have Ubuntu installed and running to your satisfaction, continue by
+installing the toolchain using the link:#ppa[`ops-class.org` PPA].
+
+[[vagrant]]
+=== Headless Virtual Machine (No GUI)
+
+Consider this option if:
+
+* you'd prefer a more lightweight virtual machine, and
+//
+* if you are using Windows, you are comfortable editing files in a text-based
+editor like
+//
+http://www.vim.org/[Vim] or https://www.gnu.org/software/emacs/[Emacs].
+
+We maintain an {ops-class} https://github.com/ops-class/vagrant[Vagrant
+configuration].
+//
+It loads a pre-built headless (no GUI) VirtualBox virtual machine
+//
+footnote:[We'll talk a lot more about virtualization in class, but here's one
+example of how useful it can be.]
+//
+based on the minimal
+//
+https://github.com/chef/bento[Bento]
+//
+https://www.ubuntu.com/[Ubuntu]
+//
+https://www.vagrantup.com/[Vagrant]
+//
+boxes.
+//
+The current version is based on
+//
+http://releases.ubuntu.com/16.04/[Ubuntu 16.04 LTS "Xenial Xerus"].
+//
+It contains the rest of the toolchain, including link:#sys161[`sys161`],
+link:#compilers[the OS/161 cross-compilers], and link:#test161[`test161`].
+
+==== Current version
+
+https://github.com/ops-class/vagrant/tree/v1.2[1.2] is the current version.
+
+==== Installation
+
+Install
+//
+https://www.vagrantup.com/[Vagrant]
+//
+and
+//
+https://git-scm.com/book/en/v2/Getting-Started-Installing-Git[Git].
+//
+Note that Ubuntu packages very old versions of Vagrant for `apt-get`.
+//
+You'll have better luck following the instructions on the
+//
+https://www.vagrantup.com/[Vagrant website].
+//
+(This is also true for Git. You may want to add the
+//
+https://launchpad.net/~git-core/+archive/ubuntu/ppa[Git maintainers PPA].)
+
+Then:
+
+----
+git clone https://github.com/ops-class/vagrant
+cd vagrant && vagrant up
+----
+
+The `vagrant up` may take a few minutes.
+//
+Once it completes, you should be able to log in to the virtual machine and
+run the OS/161 tools:
+
+[source,bash]
+----
+$ vagrant ssh
+trinity@zion:~$ sys161
+sys161: System/161 release ...
+sys161: Usage: sys161 [sys161 options] kernel [kernel args...]
+...
+----
+
+==== Installation troubleshooting
+
+First examine the `vagrant up` logs for errors.
+//
+Some messages that appear to be errors are in fact usually benign.
+//
+These include:
+
+[role='red']
+----
+W: mdadm: /etc/mdadm/mdadm.conf defines no arrays.`
+----
+
+[role='red']
+----
+==> default: mesg:
+==> default: ttyname failed
+==> default: :
+==> default: Inappropriate ioctl for device
+==> default: dpkg-preconfigure: unable to re-open stdin: No such file or directory
+----
+
+Also make sure that all Vagrant commands (`vagrant up`, `vagrant ssh`, etc.)
+are run from the same directory as your `Vagrantfile`.
+//
+That's just how Vagrant works.
+
+==== Notes for Windows users
+
+The https://github.com/ops-class/vagrant/[`Vagrantfile` README]
+//
+describes some potential pitfalls for Windows users.
+//
+Some concern initialization.
+
+Another known problem is that some Windows hosts will not allow guests to
+create symbolic links in shared folders.
+//
+If you try to build your OS/161 sources from  a shared folder, the build will
+fail when it tries to create symbolic links in the compilation directory.
+
+There are two workarounds.
+
+. Run all of your `vagrant` commands as a Windows administrator: `vagrant
+up`, `vagrant ssh`, etc.
+//
+This provides provide the guest with the required permissions to create
+symbolic links.
+//
+. Don't share your source folder and edit your code inside the virtual
+machine using a terminal-based editor.
+
+==== Upgrading the toolchain
+
+----
+trinity@zion:~$ sudo apt-get update ; sudo apt-get upgrade
+----
+
+==== Upgrading the virtual machine
+
+This _can_ be done by first updating the `Vagrantfile` via `git pull` and
+then forcing Vagrant to reprovision the VM:
+
+----
+vagrant halt
+git pull
+vagrant up --provision
+----
+
+But it may be easier to simply destroy the old VM and create a new one.
+//
+*Be sure to preserve your OS/161 sources!*
+
+[[ppa]]
+=== {ops-class} PPA
+
+The {ops-class} {ppa} includes all toolchain components packaged for
+//
+http://releases.ubuntu.com/16.04/[Ubuntu 16.04 LTS "Xenial Xerus"].
+//
+and
+//
+http://releases.ubuntu.com/14.04/[Ubuntu 14.04 LTS "Trusty Tahr"].
+//
+If you have 16.04 or 14.04 installed, you can install these packages directly.
+//
+If you are using a slightly earlier or later Ubuntu release, the Xenial
+packages will probably work:
+//
+https://help.ubuntu.com/community/Repositories/CommandLine[This help page]
+should get you started.
+//
+If you are using a much earlier Ubuntu release, you should upgrade.
+
+As of early 2017 we have evidence that the Xenial packages also seem to work
+on Windows 10 under the Windows Subsystem for Linux.
+//
+So this is another option for Windows users.
+//
+This is a new option for us, and we'll update this document as we know more.
+
+==== Installation
+
+----
+sudo add-apt-repository ppa:ops-class/os161-toolchain
+sudo apt-get update
+sudo apt-get install os161-toolchain
+----
+
+==== Upgrading
+
+----
+sudo apt-get update
+sudo apt-get install os161-toolchain
+----
+
+[[source]]
+=== Install from Source
+
+We don't support this option, but if you'd like to try instructions are
+available at the {os161-link}[OS/161 website].
+//
+You will need to download, configure, compile and install the OS/161 toolchain
+using the modified sources.
+//
+Follow the online directions.
+//
+*However, rather that using David's tarballs we would suggest that you use the
+official `ops-class.org` sources* which are available on GitHub for
+link:#test161[`test161`], link:#sys161[`sys161`], and link:#compilers[the
+cross compilers].
+
+Linux and other UNIX variants are likely to work.
+//
+OSX may require patches.
+//
+Keep reading for more instructions.
+
+[[os161]]
+== Source
+
+{os161} is maintained by
+//
+http://www.hcs.harvard.edu/~dholland/[David Holland]
+//
+at Harvard University.
+//
+We maintain a
+//
+https://github.com/ops-class/os161[OS/161 fork on GitHub]
+//
+that includes {ops-class}-specific changes.
+//
+Most of our changes are to enable automated testing using {test161}.
+
+=== Current Version
+
+https://github.com/ops-class/os161/tree/master[2.0.2]
+//
+based on
+//
+http://os161.eecs.harvard.edu/download/[upstream version 2.0.2].
+//
+Our fork is currently up-to-date with the latest {os161} version.
+
+=== Installation
+
+Clone our
+//
+https://github.com/ops-class/os161[GitHub repository].
+//
+Note that this sets the Git remote name to `staff` so that you can use
+`origin` for your own private repository where you store your changes.
+
+----
+git clone https://github.com/ops-class/os161 -o staff
+----
+
+=== Upgrading
+
+Pull and merge upstream changes from our
+//
+https://github.com/ops-class/os161[GitHub repository].
+//
+Note that this depends on having our OS/161 GitHub repository named `staff`
+rather than `origin`, as described above.
+//
+You will also need to inspect the output of `git pull` (or `git status`) and
+fix any merge conflicts.
+
+----
+git pull staff master
+----
+
+== Toolchain Components
+
+Below we describe the individual components of the toolchain.
+//
+But note that the correct way to install the toolchain is either using
+link:#vagrant[Vagrant] or our link:#ppa[PPA] as described above.
+
+[[test161]]
+=== `test161`
+
+{test161} is our OS/161 distributed automated grading and testing tool.
+//
+It is maintained by
+//
+https://blue.cse.buffalo.edu/people/shaseley[Scott Haseley].
+//
+Sources are available on
+//
+https://github.com/ops-class/test161[GitHub]
+//
+and pull requests containing bug fixes or enhancements are welcome.
+
+==== Current version
+
+https://github.com/ops-class/test161/tree/v1.2.5[1.2.5]
+//
+is the current version.
+
+==== Installation
+
+If you are using our link:#ppa[PPA], then you already have `test161`.
+//
+If you are installing from source, once you have
+//
+https://golang.org[Go]
+//
+installed, the following command will install {test161} into your `$GOPATH`:
+
+----
+go get -u github.com/ops-class/test161/test161
+----
+
+==== Upgrading
+
+If you are using our link:#ppa[PPA], then follow the upgrade instructions
+above.
+//
+If you installed from source:
+
+----
+go get -u github.com/ops-class/test161/test161
+----
+
+[[sys161]]
+=== System/161
+
+{system161} is maintained by
+//
+http://www.hcs.harvard.edu/~dholland/[David Holland]
+//
+at Harvard University.
+//
+We maintain our own
+//
+https://github.com/ops-class/sys161[GitHub `sys161` repository]
+//
+for the purpose of packaging `sys161` for our {ppa}.
+//
+We have also made some contributions to `sys161` related to {test161}
+automation and statistics control.
+
+==== Current version
+
+{ppa-link}[2.0.8]
+//
+which is identical to
+//
+http://os161.eecs.harvard.edu/download/[upstream version 2.0.8].
+
+==== Installation
+
+If you are using our link:#ppa[PPA], then you already have `sys161`.
+//
+You can also try
+//
+http://os161.eecs.harvard.edu/resources/setup.html[installing from source]
+//
+footnote:[Good luck!].
+
+==== Upgrading
+
+If you are using our link:#ppa[PPA], then follow the upgrade instructions
+above.
+//
+If you installed from source, reinstall from source.
+
+[[compilers]]
+=== OS/161 Cross Compilers
+
+{os161} requires a set of patched cross compilers which are maintained by
+//
+http://www.hcs.harvard.edu/~dholland/[David Holland]
+//
+at Harvard University
+//
+footnote:[Surprise, surprise!].
+//
+We have packaged these for our link:#ppa[PPA], and maintain packaging
+repositories for
+//
+https://github.com/ops-class/gcc[GCC],
+//
+https://github.com/ops-class/gdb[GDB],
+//
+https://github.com/ops-class/bmake[`bmake`],
+//
+and the https://github.com/ops-class/binutils[binary utilities].
+
+==== Current version
+
+Identical to the latest versions shown
+//
+http://os161.eecs.harvard.edu/download/[here].
+
+==== Installation
+
+If you are using our link:#ppa[PPA], then you already have the OS/161
+toolchain.
+//
+You can also try
+//
+http://os161.eecs.harvard.edu/resources/setup.html[installing from source].
+
+==== Upgrading
+
+If you are using our link:#ppa[PPA], then follow the upgrade instructions
+above.
+//
+If you installed from source, reinstall from source.
+
+// vim: ts=2:sw=2:et

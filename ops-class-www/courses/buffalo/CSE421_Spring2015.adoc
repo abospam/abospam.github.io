@@ -1,0 +1,59 @@
+---
+title: "CSE 421/521 Spring 2015"
+description: >
+  Course materials for CSE 421/521 at the University at Buffalo in Spring
+  2015.
+priority: 0.6
+changefreq: never
+---
+
+== Evaluations
+
+[cols="60,^40"]
+|===
+
+| Enrollment | 133
+| Response Rate (%) | 94
+| Instructor Rating (out of 5)| 4.65
+| Course Rating (out of 5) | 4.24
+
+|===
+
+Full evaluation results are available
+//
+link:/courses/buffalo/CSE421_Spring2015_Evaluations.pdf[here].
+//
+Note that beginning in 2014&ndash;2015, when the University at Buffalo adopted
+a new course evaluation system provided by
+//
+http://www.campuslabs.com/[Campus Labs],
+//
+results from 421 and 521 cohorts were no longer available separately.
+
+== Videos
+
+=== Lectures
+
+++++
+<div class="embed-responsive embed-responsive-16by9">
+<div class="lazy-iframe" data-src="https://www.youtube.com/embed/videoseries?list=PLE6LEE8y2Jp8U4xVODdQtgJ945HeMwosQ&amp;showinfo=1"></div>
+</div>
+++++
+
+=== Recitations
+
+++++
+<div class="embed-responsive embed-responsive-16by9">
+<div class="lazy-iframe" data-src="https://www.youtube.com/embed/videoseries?list=PLE6LEE8y2Jp9DnLcZFyX2f_JnUsmeS7vL&amp;showinfo=1"></div>
+</div>
+++++
+
+== Syllabus
+
+++++
+<div class="embed-responsive embed-responsive-4by3">
+	<object data="/courses/buffalo/CSE421_Spring2015.pdf" type='application/pdf'>
+		<a href="/courses/buffalo/CSE421_Spring2015.pdf">Syllabus</a>
+	</object>
+</div>
+++++

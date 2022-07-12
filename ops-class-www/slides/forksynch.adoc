@@ -1,0 +1,325 @@
+---
+title: "fork() and pipe()"
+date: 2017-02-10
+author: Geoffrey Challen
+description: >
+  Completion of a discussion of fork including the use of pipes.
+song:
+  name: "Coming Back to Life"
+  author: Pink Floyd
+  youtube: uhV4me_k8Y8
+video: pnPsKKGbsO0
+---
+[.nooutline]
+== Technical Women
+
+image::women/002.jpg[width="100%",title="Sophie Wilson",link="https://en.wikipedia.org/wiki/Sophie_Wilson"]
+
+[.h3.center]
+icon:music[] http://www.pinkfloyd.com/[{song}]
+
+video::{music}[youtube,width=0,height=0]
+
+[.nooutline]
+== Today
+
+. Process life cycle:
+** *Birth:* `fork()`
+. Introduction to synchronization
+
+[.nooutline]
+== link:/asst/1/[ASST1] Checkpoint
+
+[.slider]
+//
+.At this point:
+//
+* If you have not started, *you're behind.*
+//
+* If you don't understand semaphores, *you're behind.*
+//
+* If you only have working locks, *you're behind.*
+//
+* If you have working CVs, you're a bit behind.
+//
+* If you have solved one of the synchronization problems or have working
+reader-writer locks, you're OK.
+//
+* Keep in mind: *you need working locks and CVs for future assignments.*
+//
+** (The rest of the assignment is for points and won't hurt you as much in the
+future.)
+
+[.nooutline]
+== Review: Updated Process Model
+
+image::figures/process-updated.svg[width="60%",role='vbottom expand']
+
+[.nooutline]
+== Review: Levels of Indirection
+
+[.slider]
+* *Three* levels of indirection:
+** file descriptor -> file handle.
+** file handle -> file object.
+** file object -> blocks on disk.
+
+[.nooutline]
+== Review: Sharing File State
+
+[.slider]
+.The additional level of indirection allows certain pieces of state to be shared separately.
+* *File descriptors* are private to each process.
+* *File handles* are private to each process but shared after process
+creation.
+** *File handles* store the current file *offset*, or the position in
+the file that the next read will come from or write will go to. File
+handles can be *deliberately* shared between two processes.
+* *File objects* hold other file state and can be shared *transparently*
+between many processes.
+
+== Process Creation
+
+Where do processes come from?
+
+== `fork()` # create a new process
+
+[.small.slider]
+.`fork()` is the UNIX system call that creates a new process.
+* `fork()` creates a new process that is a *copy* of the calling process.
+* After `fork()` we refer to the caller as the *parent* and the
+newly-created process as the *child*. This relationship enables certain
+capabilities.
+
+image::figures/process-updated.svg[width="60%",role='vbottom expand']
+
+== `fork()` Semantics
+
+[.slider]
+* Generally `fork()` tries to make an *exact* copy of the calling process.
+** Recent version of UNIX have relaxed this requirement and there are
+now many flavors of `fork()` that copy different amounts of state and are
+suitable for different purposes.
+** For the purposes of this class, ignore them.
+* Threads are a notable exception!
+
+== `fork()` Against Threads
+
+[.slider]
+* Single-threaded `fork()` has reliable semantics because the *only
+thread* the processes had is the one that called `fork()`.
+** So nothing else is happening while we complete the system call.
+* Multi-threaded `fork()` creates a host of problems that many systems
+choose to ignore.
+** Linux will only copy state for the thread that called `fork()`.
+
+== Multi-Threaded `fork()`
+
+[.slider]
+.There are two major problems with multi-threaded `fork()`
+. Another thread could be blocked in the middle of doing something
+(uniprocessor systems), or
+. another thread could be *actually* doing something (multiprocessor
+systems).
+
+[.slide]
+--
+This ends up being a big mess. Let's just copy the calling thread.
+--
+
+== `fork()`
+
+[.slider]
+. `fork()` copies one thread--the caller.
+. `fork()` copies the address space.
+. `fork()` copies the process file table.
+
+[.slide.replace]
+--
+image::figures/fork-4.svg[image,width=100%,role='vbottom']
+--
+
+[.slide.replace]
+--
+image::figures/fork-3.svg[image,width=100%,role='vbottom']
+--
+
+[.slide.replace]
+--
+image::figures/fork-2.svg[image,width=100%,role='vbottom']
+--
+
+[.slide.replace]
+--
+image::figures/fork-1.svg[image,width=100%,role='vbottom']
+--
+
+[.slide.replace]
+--
+image::figures/fork.svg[image,width=100%,role='vbottom']
+--
+
+== After `fork()`
+
+[source,c]
+----
+returnCode = fork();
+if (returnCode == 0) {
+  # I am the child.
+} else {
+  # I am the parent.
+}
+----
+
+[.smaller.slider]
+* The child thread returns executing at the exact same point that its
+parent called `fork()`.
+** With one exception: `fork()` returns *twice*, the PID to the parent and
+0 to the child.
+* All contents of memory in the parent and child are identical.
+* Both child and parent have the same files open at the same position.
+** *But, since they are sharing file handles changes to the file
+offset made by the parent/child will be reflected in the child/parent!*
+
+== Calm Like A ``fork()``bomb
+
+What does this code do?
+
+[source,c]
+----
+while (1) {
+  fork();
+}
+----
+
+== !
+
+[.background]
+image:http://static.comicvine.com/uploads/original/6/67602/2255673-agent_smith.jpg[]
+
+[.meme-top]
+while 1
+
+[.meme-bottom]
+fork()
+
+== Pipes
+
+[.slider]
+.Chains of communicating processes can be created by exploiting the `pipe()` system call.
+* `pipe()` creates an anonymous pipe object and returns a two file
+descriptors: one for the read-only end, and the other for the write-only
+end.
+* Anything written to the write-only end of the pipe is immediately
+available at the read-only end of the pipe.
+* Pipe contents are buffered in memory.
+* *Why is this useful?*
+
+== IPC Using `fork()` and `pipe()`
+
+. Before calling `fork()` the parent creates a pipe object by calling
+pipe().
+. Next, it calls `fork()`.
+. After `fork()` the parent closes its copy of the read-only end and the
+child closes its copy of the write-only end.
+. Now the parent can pass information to the child.
+
+== IPC Using `fork()` and `pipe()`
+
+[.slide.replace]
+--
+image::figures/pipes-example.svg[image,width="100%",role='vcenter']
+--
+
+[.slide.replace]
+--
+image::figures/pipes-example-1.svg[image,width="100%",role='vcenter']
+--
+
+[.slide.replace]
+--
+image::figures/pipes-example-2.svg[image,width="100%",role='vcenter']
+--
+
+[.slide.replace]
+--
+image::figures/pipes-example-3.svg[image,width="100%",role='vcenter']
+--
+
+== IPC Using `fork()` and `pipe()`
+
+[source,c,role='smaller spelling_exception']
+----
+# pipeEnds[0] gets the read end; pipeEnds[1] gets the write end.
+int pipeEnds[2];
+
+pipe(pipeEnds);
+
+int returnCode = fork();
+
+if (returnCode == 0) {
+
+  # Don't need a loopback.
+  close(pipeEnds[1]);
+
+  # Read some data from the pipe.
+  char data[14];
+  read(pipeEnds[0], data, 14);
+} else {
+
+  # Don't need a loopback.
+  close(pipeEnds[0]);
+
+  # Write some data to the pipe.
+  write(pipeEnds[1], "Hello, sweet child!\n", 14);
+}
+----
+
+== Issues with `fork()`
+
+[.slider]
+.Copying all that state is expensive!
+* Especially when the next thing that a process frequently does is
+start load a new binary which destroys most of the state `fork()` has
+carefully copied!
+
+[.slider]
+.Several solutions to this problem:
+* *Optimize existing semantics*: through copy-on-write, a clever
+memory-management optimization we will discuss in several weeks.
+* *Change the semantics*: `vfork()`, which will fail if the child does anything other than
+immediately load a new executable.
+** Does not copy the address space!
+
+== Issues with `fork()`
+
+.What if I don't want to copy all of my process state?
+[.slider]
+* `fork()` is now replaced by `clone()`, a more flexible primitive that
+enables more control:
+** over sharing, including sharing memory, and signal handlers,
+** and over child execution, which begins at a function pointer passed
+to the system call instead of resuming at the point where `fork()` was
+called.
+* Try `man clone` in your CSE421 VM.
+
+== The Tree of Life
+
+[.slider]
+* `fork()` establishes a parent-child relationship between two process at
+the point when each one is created.
+* The `pstree` utility allows you to visualize these relationships.
+
+image::figures/pstree.svg[width="80%", role='slide expand']
+
+== Questions?
+
+[.nooutline]
+== Next Time
+
+.Synchronization Primitives
+** Critical sections
+** Spinlocks
+** Locks
+
+// vim: ts=2:sw=2:et

@@ -1,0 +1,717 @@
+---
+title: "Introduction to CSE 421/521"
+date: 2016-01-25
+author: Geoffrey Challen
+description: >
+  Introduction to an introduction to operating systems, the course staff, and
+  course policies.
+spelling_exceptions:
+  - TA'd
+video: rEmxpc9C198
+---
+[.nooutline]
+== Welcome to CSE 421/521
+
+.Today:
+* Meet the CSE 421/521 staff!
+* Introduction to course content
+* Overview of course policies
+
+video::9L8yEDcZ-QI[youtube,width=320,height=180]
+
+== Why I'm Here
+
+== !
+
+[.background]
+image:https://flagshipfiction.files.wordpress.com/2015/02/morpheus-red-pill-vs-blue-pill.jpg[]
+
+[.meme-bottom]
+I took the red pill
+
+[.nooutline]
+== Why I'm Here
+
+[.slider]
+* I took CS161 @ Harvard--now also known as CSE 421/521 at the
+University at Buffalo--from Margo Seltzer in 2001
+* At that point I was a physics major, but I wouldn't be for long&hellip;
+* ...because I discovered that I loved building computer systems and teaching
+people about them.
+* I would up in graduate school (where I TA'd this course many times).
+* And graduate school landed me right back here to begin the cycle again.
+
+<<<
+
+[.big.vcenter]
+--
+*So be careful: this class can be transformative!*
+--
+
+== !
+
+[.background]
+image:http://laschoolreport.com/wp-content/uploads/2013/08/Sad-Teacher.jpg[]
+
+[.meme-top]
+Took this class
+
+[.meme-bottom]
+Became a professor
+
+[.nooutline]
+== Why Are You Here?
+
+== Introducing the 2015 Course Staff
+
+== !
+
+[.background]
+image:http://kickofjoy.com/wp-content/uploads/2014/04/5-Soulful-Ways-To-Support-Your-Best-Friends.jpg[]
+
+[.meme-top]
+Meet
+
+[.meme-bottom]
+Your new best friends
+
+[.nooutline]
+== Introducing the 2015 Course Staff
+
+We probably have the *best* course staff ever this year: a mixture of new
+TAs, veteran volunteers, and a large group of "ninjas"&mdash;students returning
+from last year to help out.
+
+.Official Teaching Assistants
+[.slider]
+. *Jerry Ajay*
+. *Ali Ben Ali*
+. *Xu Zhen*
+
+[.slide]
+--
+Ali and Jerry will teach recitations, and all three TAs will mark all graded
+work.
+--
+
+<<<
+
+.Unofficial Teaching Assistants
+[.slider]
+. *Yihong Chen*
+. *Scott Haseley*
+. *Carl Nuessle*
+. *Guru Prasad*
+. *Jinghao Shi*
+
+[.slide]
+--
+These https://blue.cse.buffalo.edu[blue] group graduate students will help
+with office hours and work on tool development. All are former 421/521
+students!
+--
+
+<<<
+
+.Ninjas:
+[.slider]
+. *Dan Conway*
+. *Gela Malek Pour*
+. *Isaac Reath*
+. *Benjamin Rueda*
+. *Mark Simpson*
+. *Yousuf Zubairi*
+
+[.slide]
+--
+Our ninjas are all (excellent) returning 2015 undergraduates. You'll see them
+in office hours and they are also helping develop course infrastructure.
+--
+
+== Operating Systems Briefly Defined
+
+.Operating System:
+[.slider]
+. A *computer program* that
+. *multiplexes hardware resources* and
+. *implements useful abstractions*.
+
+[.slide]
+--
+The OS is just another computer program! [.slide]#(If a large,
+complex, mature and mission critical one.)#
+--
+
+[.slide]
+--
+*Multiplexing* allows multiple people or programs to use the same set of
+hardware resources--processors, memory, disks, network connection--safely and
+efficiently.
+--
+
+[.slide]
+--
+*Abstractions*--processes, threads, address spaces, files, and
+sockets--simplify the usage of hardware resources by organizing information
+or implementing new capabilities.
+--
+
+== Motivating This Class
+
+[.slider]
+* How many of you have participated in OS development?
+* How many of you regularly program in languages that use operating system
+abstractions directly?
+* So why study operating systems? Why is this class even offered? *Why is it
+required?*
+
+== !
+
+[.background]
+image:http://www.illuminatiagenda.com/wp-content/uploads/2013/01/jackie-chan-illuminati.jpg[]
+
+[.meme-top]
+Remind me
+
+[.meme-bottom]
+What's this for again?
+
+== Why Study Operating Systems?
+
+[.slider]
+* *Reality*: this is how computers really work, and as a computer scientist or
+engineer you should know how computers really work.
+* *Ubiquity*: operating systems are everywhere and you are likely to eventually
+encounter them or their limitations.
+* *Beauty*: operating systems are examples of mature solutions to difficult
+design and engineering problems. Studying them will improve your ability to
+design and implement abstractions.
+
+== Why Program Operating Systems?
+
+[.slider]
+* *Design*: programming operating systems stresses the importance of careful
+design and specification before coding begins. You will learn the value of
+design, probably the hard way.
+* *Difficulty*: operating systems are large existing code bases where new
+solutions have stringent performance requirements. Programming operating
+systems will make you a better programmer and improve all of your subsequent
+work.
+* *Debugging*: debugging operating systems is challenging due to their multi-
+threaded nature and the lack of typical debugging support provided to
+applications. Again, debugging operating systems will sharpen your debugging
+skills.
+
+== Course Structure
+
+[.slider]
+* Conceptual learning...
+[.slider]
+** Lectures
+** Recitations
+** Exams
+* ...by doing (programming).
+
+== Learning Objectives: Conceptual
+
+.When you finish CSE 421/521 you will:
+[.slider]
+. understand the abstractions supported by modern operating systems
+. be able to describe how operating systems policies and mechanisms safely
+and efficiently multiplex hardware resources
+. be able to analyze historical, current, and emerging operating system
+designs and features
+
+[.slide]
+--
+The main way we will know that you are learning is by your participation in
+class and recitations.
+--
+[.slide]
+--
+You will be tested for mastery on exams.
+--
+
+== Conceptual Progression
+
+[.small.slider]
+* Introduction to operating system abstractions and structure.
+* Abstracting and multiplexing:
+[.slider]
+** the CPU--interrupts, context, threads, processes, processor scheduling,
+thread synchronization.
+** memory--memory layout, address translation, paging and segmentation,
+address spaces, translation caching, page fault handling, page eviction,
+** swapping.
+** storage--spinning disks and Flash, spinning disk scheduling, on-disk
+layout, files, buffer cache, crash and recovery.
+* Virtualization.
+* Networking (time permitting)
+
+== Learning the Concepts
+
+[.slider]
+* Attend class.
+* Come to class on time:
+** Music starts as soon as I can get into the room...
+** Lectures will start at 2:05PM sharp and finish by 2:50PM.
+* Ask questions during class.
+** I'm very flexible about how much we cover this semester.
+** I would rather teach less and have everyone understand it.
+** Our back-and-forth during class is the one of the few indicators I have of
+how much you are absorbing...
+
+== References
+
+[.slide]
+[.spelling_exception]
+--
+.Modern Operating Systems by Andrew Tanenbaum
+image::http://ecx.images-amazon.com/images/I/51dqadCuRiL.jpg[title="Modern Operating Systems by Andrew Tanenbaum",width="25%",link="http://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X/"]
+--
+
+<<<
+[.spelling_exception]
+--
+.The C Programming Language
+image::http://ecx.images-amazon.com/images/I/71RwRPoFK%2BL.jpg[title="The C Programming Language by Kernighan and Ritchie",width="25%",link="http://www.amazon.com/C-Programming-Language-2nd/dp/0131103628/"]
+--
+
+[.slide]
+--
+*Material presented in lecture takes priority over anything you find in
+a book or online.*
+--
+
+== Learning Objectives: Programming
+
+[.slider]
+.When you finish CSE 421/521 you will:
+. be able to design and implement well-structured systems software
+. utilize appropriate synchronization primitives
+. identify and correct bugs in complex multi-threaded systems
+. be able to formulate and test performance hypotheses
+
+[.slide]
+--
+We will know that you are learning by your participation in class, recitations,
+and office hours, and your use of online testing resources.
+--
+
+[.slide]
+--
+You will be tested for mastery by each programming assignment.
+--
+
+== Programming Progression
+
+*All due dates Friday @ 5PM EST.*
+
+[.slide]
+* ASST0: Introduction to OS/161--Due Friday 2/12 @ 5PM.
+** Become comfortable using standard UNIX development tools.
+** Learn to navigate the OS/161 source tree.
+** Configuring, building and running your first kernel.
+
+[.slide]
+* ASST1: Synchronization Primitives--Due Friday 2/12 @ 5PM.
+** Design and implement locks and condition variables.
+** Use them to solve several toy synchronization problems.
+
+[.nooutline]
+== Did You Think It Would Be That Easy?
+
+video::hii2SwI39ek[youtube,width=640,height=360,start=492,end=503]
+
+== !
+
+[.background]
+image:http://images.vcpost.com/data/images/full/17029/kill-bill-vol-2.jpg[]
+
+[.meme-top]
+Thought I was done
+
+[.meme-bottom]
+Then noticed ASST3
+
+== Programming Progression
+
+*All due dates Friday @ 5PM EST.*
+
+[.small]
+--
+[.slide]
+* ASST2: System Calls and Process Support--due Friday March 11th @ 5PM.
+** The file system system calls: `open()`, `close()`, `read()`, `write()`, `lseek()`, `dup2()`, `chdir()`, and `getcwd()`. does this work
+** The process-related system calls: `fork()`, `execv()`, `waitpid()`, `\_exit()`.
+** Several process scheduling algorithms.
+
+[.slide]
+* ASST3: Virtual Memory--due Friday May 13th @ 5PM.
+
+** TLB fault handling
+** Paging to disk
+** Several TLB entry and page replacement algorithms
+** `sbrk()`
+--
+
+== OS/161
+
+* OS/161 is an instructional operating system developed by David Holland at
+Harvard University.
+* It attempts to strike a balance between Linux and other extremely-mature
+systems--too difficult to hack on--and existing instructional operating
+systems frameworks--not realistic enough.
+* Your OS/161 kernel runs in an emulator, `sys161`, which emulates an MIPS r2000/
+r3000 instruction set architecture (ISA).
+* Using `sys161` allows us to simplify debugging and hardware support.
+
+== 10,000 Hours
+
+[.slider]
+* While many operating systems concepts are elegantly simple, implementing them
+is not.
+* Therefor, this class is not easy:
+** [red]#3.52 (-0.57)# and [red]#4.03 (-0.06)# on "Appropriate Workload"
+score in 2013 course evaluations for 421 and 521 respectively (90%+ response rate).
+* However, this class is also worthwhile:
+** [green]#4.14 (+0.31)# and [green]#4.59 (+0.76)# overall rating (2013).
+
+== !
+
+[.background]
+image:http://www.quickmeme.com/img/18/18df2b56513f75a0930a1b8f8eada16b1acb44ed986b69144e9f0abb8b2c5b33.jpg[]
+
+[.meme-top]
+Sorry
+
+[.meme-bottom]
+Learning is hard
+
+[.nooutline]
+== 2013 Student Feedback
+
+[.smaller]
+--
+* "This has been without a doubt the best class I have taken at UB."
+* "Prof. Challen holds the most engaging, thoughtful, and useful lectures I have experienced at UB."
+* "My favorite computer science course ever!"
+* "I would really recommend this class to anyone who values a true challenge and professionalism."
+* "This is the best class and best instructor i ever had."
+* "Very good teacher. Engages the entire class. Love it."
+* "This was easily the best course I have taken at UB."
+* "Learned the most from this course out of all my courses, regardless of the fact that the course is pretty hard."
+* "...I think I learned more in this from the projects in any other course ever."
+* "One of the most beneficial courses I have taken at UB."
+* "Definitely the best CS course at UB in my opinion."
+* "AWESOME course!!"
+* "The best course I have taken in UB so far!"
+* "Probably the best course offered in Computer Science Dept."
+* "This was the best courses I took at UB, in fact the best course i have taken so far ever."
+* "The best course I have attended so far"
+* "One of the best classes I've ever come across"
+--
+
+[.nooutline]
+== Questions about Content?
+
+== ops-class.org Website
+
+[.slider]
+* It's not ready... but should be soon.
+
+* We're in the process of making a lot of improvements this year, so please
+bear with us...
+
+* If it interferes with the deadlines we'll adjust them. ASST0 should be
+posted by the end of the week and you will be provided access to the
+resources you need to complete it.
+
+== Grading
+
+[.small]
+--
+[.slider]
+* Conceptual--(50%)
+** 5%--Preterm Exam (Wednesday)
+** 15%--Midterm Exam
+** 30%--Final Exam
+* Programming--(50%)
+** 5%--ASST0
+** 10%--ASST1
+** 15%--ASST2
+** 20%--ASST3
+--
+
+[.slide]
+--
+The preterm exam is free points: 5% for showing up and doing your best.
+If you do not take the preterm your midterm and final exam scores will be
+scaled appropriately.
+--
+
+== Continuous Choose-Your-Own Grade Programming Evaluations
+
+[.slider]
+* Almost all assignment grading in CSE421/521 is automated.
+* Therefore... you can have your code graded repeatedly whenever you like.
+* Therefore... you can stop each assignment whenever you are satisfied with
+your grade.
+* We are still deciding how to handle the hand-graded parts of the
+assignments... stay tuned.
+
+== Continuous Choose-Your-Own Grade Details and Caveats
+
+[.slider]
+* Assignments are done in pairs, so find a partner who is interested in
+achieving the same grade as you are.
+* Note that we do not allow students to work alone except in extremely
+unusual
+circumstances.
+** "I want to work alone" does not represent one of these
+situations!
+* Assignments are cumulative and we will not distribute solution sets without
+a significant penalty.
+
+== Communication
+
+* We will sign you all up for a mass email list.
+* We also have a Discourse forum linked off the website which is the best way to
+get help quickly.
+
+== Using Email
+
+[.slider]
+* If you need to email the course staff (#staff@ops-class.org#), please consider
+the following:
+[.slider]
+** Is this information likely to be available on the website? If yes, go find it!
+** Is the answer to this question likely to benefit other students? If yes,
+use Discourse.
+
+[.slider]
+* Before you email me directly, please also consider the following:
+[.slider]
+** Is this something that the course staff could answer? If yes, email them.
+* Here's the bottom line: the more time we spend answering repetitive email,
+the less time we have available to help you with real problems.
+
+== Getting Help: Recitations
+
+* Ali and Jerry will be holding recitations. Unfortunately recitations this
+year are for undergraduates only and one is at 8AM.
+* Recitations this year will cover a mix of conceptual and assignment-driven
+material.
+* We will also try to post some screencasts this year!
+
+== Getting Help: Office Hours
+
+[.small]
+--
+[.slider]
+* All TAs and Ninjas will be holding office hours.
+** We are hoping to have around 40 hours of office hours scheduled per week,
+meaning that you have plenty of opportunities to complete the challenging
+CSE 421 assignments.
+* Office hours are the best place to get help on the programming assignments.
+* CSE 421/521 office hours will be in Davis Hall in locations announced on the
+calendar, but probably near Davis 301B or in the Second Floor atrium.
+* Just come in and do the assignments during office hours--that way, when you
+get stuck, you are in the right place.
+--
+
+== Getting Help: Working in Pairs
+
+Partner groups are jointly responsible for joint work.
+
+[.slider]
+* If any part is plagiarized, both partners fail.
+* If any part is plagiarized, both partners fail.
+* If you have concerns about work your partner has submitted, immediately
+approach the course staff.
+* If you do not we will assume later that your consent was given.
+* It is entirely your responsibility to ensure that your team's submission
+is fair and reflects your contributions.
+
+[.slide]
+--
+Pair programming assignments for CSE 421/521 are very clear about what kinds
+of collaboration are permitted. We consider violating these expectations to
+be cheating.
+--
+
+== Getting Help: Helping Each Other
+
+[.slider]
+* The course staff will be working as hard as you--and sometimes harder--but
+there are many of you and few of us. Look to your left and your right: these
+are your comrades.
+* Good classes come through CSE 421/521 as a team.
+
+== Collaboration
+
+* Simple rule: talking about code is collaborating, talking in code (or
+exchanging code) is cheating.
+** Unless you are talking to your partner in which case anything goes.
+
+== Cheaters
+
+* I take cheating very seriously:
+[.slider]
+** Not because I am vindictive and mean...
+** ... but because I believe in protecting and honoring those of you that
+work hard and play by the rules.
+
+== !
+
+[.background]
+image:https://jrarcieri.files.wordpress.com/2011/09/the-last-of-the-mohicans-original.jpg[]
+
+[.meme-top]
+I will find cheaters
+
+[.meme-bottom]
+No matter how long it takes
+
+== Cheaters
+
+* We will use an online service to detect and investigating code similarity.
+[.slider]
+** It is very fast, so we can use it on every submission.
+** It is very accurate.
+** We will compare your assignment against everything we can think of: this
+years', last years', anything you can find online, assignments submitted at
+Harvard, etc.
+** I have a _huge_ repository of old assignments now. If you can find it, I've
+already got it.
+
+== !
+
+[.background]
+image:http://www.scoutnetworkblog.com/wp-content/uploads/2011/03/girl-with-the-dragon-tattoo-noomi-rapace.jpg[]
+
+[.meme-top]
+And when I do
+
+[.meme-bottom]
+I'll be mad
+
+== Cheaters
+
+* We catch and fail cheaters. Not for the assignment: for the entire class.
+
+== !
+
+[.background]
+image:http://i2.cdn.turner.com/cnnnext/dam/assets/150212130357-buzzfeed-obama-exlarge-169.jpeg[]
+
+[.meme-top]
+Cheated in 421/521
+
+[.meme-bottom.slide]
+Got an F
+
+== !
+
+[.background]
+image:http://www.jewishjournal.com/images/articles/dos-equis-guy.JPG[]
+
+[.meme-top]
+Cheated in 421/521
+
+[.meme-bottom.slide]
+Got an F
+
+== !
+
+[.background]
+image:http://benchmarkitconsulting.com/wp-content/uploads/2013/02/AngryCat-266x300.jpg[]
+
+[.meme-top]
+Cheated in 421/521
+
+[.meme-bottom.slide]
+Got an F
+
+== !
+
+[.background]
+image:http://s1.totalprosports.com/wp-content/uploads/2015/01/Tom-Brady-trolls-Colts.jpg[]
+
+[.meme-top]
+Didn't deflate footballs
+
+[.meme-bottom.slide]
+Got an F for copying code in 421/521
+
+== !
+
+[.background]
+image:http://www.writespirit.net/wp-content/uploads/old-images/mother-teresa.jpg[]
+
+[.meme-top]
+Cheated in 421/521
+
+[.meme-bottom.slide]
+Not really!
+
+== !
+
+[.background]
+image:https://pbs.twimg.com/profile_images/1146014416/mark-zuckerberg.jpg[]
+
+[.meme-top]
+Didn't cheat in 421/521
+
+[.meme-bottom.slide]
+Runs own business!
+
+== Questions About Collaboration?
+
+[.nooutline]
+== Inclement Weather
+
+* If Buffalo Public Schools are closed, we will not have class.
+* If the University at Buffalo is closed, we will not have class.
+
+== !
+
+[.background]
+image:memes/yihong-snow.jpg[]
+
+[.meme-bottom]
+Must do office hours!
+
+== Questions About Course Policies?
+
+[.nooutline]
+== Errata
+
+[.slider]
+* *Pre-class music*: if you have suggestions, please stop by my office hours.
+One request per student per semester and requests must be made in person.
+* Does UB think your name is "., foo bar", *and it isn't actually "., foo
+bar"*? Please let us know (staff@ops-class.org).
+
+== !
+
+[.background]
+image:http://1.bp.blogspot.com/_oOBwed426Vs/TEniVVa0ILI/AAAAAAAAAI8/D5xQBxhF7UI/s1600/\'David\'+Mr+Opportunity+Honda.jpg[]
+
+[.meme-top]
+Sorry
+
+[.meme-bottom]
+I don't speak foreign!
+
+[.nooutline]
+== Next Steps
+
+. Sit tight for more details to appear online.
+. Find a partner!
+
+* I will hold office hours Wednesday 1/27 from 11AM to 1PM if you have
+questions about the course and want to chat in person.
+* Recitations and office hours will start next week.
+* The preterm exam will be Wednesday. Please bring a pen or pencil and your UB
+ID card.

@@ -1,0 +1,381 @@
+---
+title: "Paging"
+date: 2016-03-21
+author: Geoffrey Challen
+description: >
+  Page table design and implementation.
+song:
+  name: "Till My Fingers Bleed"
+  author: "Haider Atta"
+  youtube: X-tLvUzntn4
+video: pW3g_yWMMYk
+---
+[.nooutline.spelling_exception]
+== Technical Women
+
+image::women/047.jpg[width="100%",link="https://en.wikipedia.org/wiki/Jean_E._Sammet",title="Jean Sammet"]
+
+[.h4.center]
+icon:music[] http://www.fruitbatsmusic.com/["From A Soon-To-Be Ghost Town" by Fruit Bats]
+
+[.h4.center]
+icon:music[] https://www.facebook.com/haiderattaofficial/[{song}]
+
+video::_MwbDLXSAjg[youtube,width=0,height=0]
+video::{music}[youtube,width=160,height=90]
+
+[.nooutline]
+== Today
+
+* Locating page state.
+
+[.nooutline]
+== $ cat announce.txt
+
+[.slider]
+* Midterm will cover everything through today.
+* Jinghao will lead a midterm review in recitation tomorrow.
+* No recitation Friday.
+* I'll record a midterm review screencast so that we can continue Friday.
+
+[.nooutline]
+== Midterm
+
+[.slider]
+* 50 minutes, 50 points. Scaled to 15% of your final grade.
+* Same format as previous years:
+** 10 1-point multiple choice
+** 6 choose 4 5-point short answer
+** 2 choose 1 20-point long answer.
+* Same approach as the pre-term: assigned seats, seating chart distributed
+1-hour before, etc. *Please be on time.* We will end promptly at 2:50PM.
+* **There is no makeup exam.** If you are not here and not in the hospital,
+you will receive a 0.
+
+<<<
+
+* 2016 wrinkle:
+** _most_ of the multiple choice will similar to previous years
+** _at least 2__ of the short answer will be from previous years
+** one of the long answer _may_ be from a previous year
+
+[.nooutline]
+== ASST2/ASST3 Late Credit
+
+[.slider]
+* ASST2:
+** You can still submit (25 point penalty)
+** You can request the solution set (50 point penalty). If you do so, you
+will automatically receive your original ASST2 score.
+* ASST3 deal:
+** ASST3 is broken into three 100-point parts due at two-week intervals,
+starting Friday.
+** Late submission for the first two checkpoints will result in 10 point
+deductions.
+** Late submission for the final checkpoint will result in no credit.
+
+== Locating Page State
+
+[.slider]
+* _Process:_ "Machine! Store to address `0x10000`!"
+* _MMU:_ "Where the heck is virtual address `0x10000` supposed to map to?
+Kernel...help!"
+* (Exception.)
+* _Kernel_: Let's see... where did I put that page table entry for
+`0x10000`... just give me a minute... I know it's around here somewhere...
+I really should be more organized!
+
+[.slider]
+.What are the requirements for how we locate page information?
+* *Speed*: translation is a _hot path_ and should be as efficient as
+possible.
+* *Compactness*: data structures we use should not take up too much
+physical memory.
+
+== Page Tables
+
+The data structure used to quickly map a *virtual page number* to a *page
+table entry* is called a *page table*.
+
+[.slider]
+* Each process has a _separate_ page table.
+* *Why?* [.slide]#Virtual addresses are private to each process and
+translated differently for each.#
+
+== Flat Page Tables
+
+*Approach*: use one array to hold all page table entries for each process.
+Virtual page number is index into this array.
+
+[.slide.replace]
+--
+image::figures/memory/flatpagetable-1.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/flatpagetable-2.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/flatpagetable-3.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/flatpagetable-4.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/flatpagetable-5.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/flatpagetable-6.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/flatpagetable-7.svg[width="60%"]
+--
+
+== Flat Page Tables
+
+* *Approach*: use one array to hold all page table entries for each
+process. Virtual page number is index into this array.
+
+[.slider]
+* *Speed*: O(1). VPN is used directly as an index into the array.
+* *Compactness*: *4 MB* per process that may have to be *contiguous*!
+Most is *unused*!
+
+image:figures/memory/flatpagetable-7.svg[width="50%"]
+
+== Linked List Page Tables
+
+[.slider]
+* *Approach*: list of PTEs for each process, searched on each
+translation.
+
+[.slide.replace]
+--
+image::figures/memory/linkedlistpagetable-1.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/linkedlistpagetable-2.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/linkedlistpagetable-3.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/linkedlistpagetable-4.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/linkedlistpagetable-5.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/linkedlistpagetable-6.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/linkedlistpagetable-7.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/linkedlistpagetable-8.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/linkedlistpagetable-9.svg[width="60%"]
+--
+
+== Linked List Page Tables
+
+*Approach*: list of PTEs for each process, searched on each
+translation.
+
+[.slider]
+* *Speed*: O(n) for n valid virtual pages.
+* *Compactness*: *4 bytes * n* for n valid virtual pages. All entries
+are used!
+
+image:figures/memory/linkedlistpagetable-9.svg[width="50%"]
+
+[.nooutline]
+
+== [.spelling_exception]#An Early ASST3 K.I.S.S.:#
+
+Don't feel like you have to do something overly complicated for ASST3!
+First get it right, then optimize.
+
+== Multi-Level Page Tables
+
+*Approach*: build a tree-like data structure mapping VPN to PTE. Break
+VPN into multiple parts, each used as an index at a separate level of
+the tree.
+
+[.slider]
+* Example: with 4K pages VPN is *20* bits. Use *top 10* bits as index
+into *top-level* page table, *bottom 10 bits* as index into second-level
+page table.
+** Each page table is 2^10^ * 4 bytes = 4K. Convenient!
+
+== Multi-Level Page Tables
+
+[.slide.replace]
+--
+image::figures/memory/multilevelpagetable-1.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/multilevelpagetable-2.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/multilevelpagetable-3.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/multilevelpagetable-4.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/multilevelpagetable-5.svg[width="60%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/multilevelpagetable-6.svg[width="60%"]
+--
+
+== Multi-Level Page Tables
+
+Build a tree-like data structure mapping VPN to PTE. Break VPN into multiple
+parts, each used as an index at a separate level of the tree.
+
+[.slider]
+* *Speed*: O(c). Constant number of look ups per translation depending on
+tree depth.
+* *Compactness*: Depends on sparsity of address space, but better than
+flat and worse than linked list.
+
+== Out of Core
+
+So far we have been talking about cases where processes are able to use
+the physical memory available on the machine.
+
+[.slide]
+--
+But what happens when we *run out*?
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-1.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-2.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-3.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-4.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-5.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-6.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-7.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-8.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-9.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-10.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-11.svg[width="80%"]
+--
+
+[.slide.replace]
+--
+image::figures/memory/swapping-12.svg[width="80%"]
+--
+
+== Out of Core
+
+When we *run out*, there are two options:
+[.slider]
+. *Fail*, and either don't load the process (`exec()`), don't create a
+new process (`fork()`), refuse to allocate more heap (`sbrk()`), or kill the
+process if it is trying to allocate more stack.
+
+. *Create more space*, preserving the contents of memory for later use.
+
+== Virtually Sneaky
+
+Virtual address translation gives the kernel the ability to remove
+memory from a process *behind its back*.
+
+[.slider]
+.What are the requirements for doing this?
+* The _last time_ the process used the virtual address, it behaved like
+memory.
+* The _next time_ the process uses the virtual address, it behaves like
+memory.
+* In between, whatever data was stored at that address must be
+*preserved*.
+
+[.nooutline]
+== Next Time
+
+[.slider]
+* Swapping. How do we remove a page?
+* Page replacement algorithms. How do we choose a page to remove?
